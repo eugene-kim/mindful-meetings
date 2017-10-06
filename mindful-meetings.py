@@ -4,6 +4,7 @@ from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
 
+import os
 import pprint
 import iso8601
 import time
@@ -27,7 +28,7 @@ meetingStartedSleepLength = 1
 noMotionSleepLength = 1
 
 def getCalendarService():
-  credentials = ServiceAccountCredentials.from_json_keyfile_name('/Users/eugene.kim/.credentials/mindful_meetings_private_key.json', scopes=apiScopes)
+  credentials = ServiceAccountCredentials.from_json_keyfile_name(os.environ["G_APPS_PRIVATE_KEY_PATH"], scopes=apiScopes)
   delegated_credentials = credentials.create_delegated('ekim@kenzyworld.com')
   http_auth = delegated_credentials.authorize(Http())
   calendar = build('calendar', 'v3', http=http_auth)
