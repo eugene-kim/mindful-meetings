@@ -9,26 +9,12 @@ import pprint
 import iso8601
 import time
 import datetime
+import config
 
 pp = pprint.PrettyPrinter(indent=4)
 
-
-roomEmail = "kenzyworld.com_3837373936323438313637@resource.calendar.google.com"
-apiScopes = ['https://www.googleapis.com/auth/admin.directory.resource.calendar','https://www.googleapis.com/auth/calendar']
-
-# Sleep times are in seconds
-
-# Time to sleep if there isn't a meeting going on right now.
-noMeetingSleepLength = 10
-
-# Amount of time to give people who are in the previous meeting to leave the room.
-meetingStartedSleepLength = 1
-
-# Amount of time give people from the previous room to leave the room.
-noMotionSleepLength = 1
-
 def getCalendarService():
-  credentials = ServiceAccountCredentials.from_json_keyfile_name(os.environ["G_APPS_PRIVATE_KEY_PATH"], scopes=apiScopes)
+  credentials = ServiceAccountCredentials.from_json_keyfile_name(os.environ["G_APPS_PRIVATE_KEY_PATH"], scopes=config.api_scopes)
   delegated_credentials = credentials.create_delegated('ekim@kenzyworld.com')
   http_auth = delegated_credentials.authorize(Http())
   calendar = build('calendar', 'v3', http=http_auth)
@@ -86,7 +72,7 @@ def wasMotionDetected():
 
 def start():
   calendarService = getCalendarService()
-  meetings = getTodaysRoomMeetings(roomEmail, calendarService)
+  meetings = getTodaysRoomMeetings(config.room_email, calendarService)
 
   while True:
     print 'Checking if a meeting is started now.'
@@ -103,8 +89,8 @@ def start():
       except KeyError, e:
         print "Scheduled meeting is starting now."
 
-      print "Waiting {0} seconds for the room to clear of previous inhabitants.".format(meetingStartedSleepLength)
-      time.sleep(meetingStartedSleepLength)
+      print "Waiting {0} seconds for the room to clear of previous inhabitants.".format(config.meeting_started_sleep_length)
+      time.sleep(config.meeting_started_sleep_length)
 
       if (wasMotionDetected()):
         print 'Human presence has been detected in the meeting room. Thank you for being mindful.'
@@ -120,15 +106,19 @@ def start():
             removeRoomFromMeeting(roomEmail, currentMeeting, calendarService)
             break
           else:
-            print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.'.format(loopCount, organizerEmail, noMotionSleepLength))
+            print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.'.format(
+              loopCount,
+              organizerEmail,
+              config.no_motion_sleep_length
+            ))
             # Send email
 
             loopCount += 1
 
     else:
-      print 'No meeting is starting now. Sleeping for {0} seconds.'.format(noMeetingSleepLength)
+      print 'No meeting is starting now. Sleeping for {0} seconds.'.format(config.no_meeting_timeout)
 
-      time.sleep(noMeetingSleepLength)
+      time.sleep(config.no_meeting_timeout)
 
 
 start()
