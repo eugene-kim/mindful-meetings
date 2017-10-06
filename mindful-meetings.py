@@ -77,7 +77,6 @@ def start():
   meetings = getTodaysRoomMeetings(config.room_email, calendarService)
 
   while True:
-    print 'Checking if a meeting is started now.'
 
     # TODO: Make this smarter...
     currentMeeting = getCurrentMeeting(meetings)
@@ -100,8 +99,11 @@ def start():
       while True: 
         if pir.motion_detected:
           startTime = time.time()
-          
+
+          print '---------------------------------------------------------------------------------'
           print 'Human presence has been detected in the meeting room. Thank you for being mindful.'
+          print '---------------------------------------------------------------------------------'
+          
           break
         else:
           organizer = currentMeeting['organizer']
@@ -109,19 +111,19 @@ def start():
           endTime = time.time()
           totaltime = endTime-startTime
 
-          if int(totaltime) == 60:
+          if int(totaltime) == 50:
             print('No motion detected and maximum time reached. Freeing up the room for others to reserve.')
             removeRoomFromMeeting(config.room_email, currentMeeting, calendarService)
             mindfulmail.emailuser(organizerEmail, 15)
             time.sleep(.5)
             break
-          if int(totaltime) == 40:
+          if int(totaltime) == 30:
             print('No motion detected. Sending reminder email #2 to {0}.\n'.format(
               organizerEmail
             ))
             mindfulmail.emailuser(organizerEmail, 10)
             time.sleep(.5)
-          if int(totaltime) == 20:
+          if int(totaltime) == 10:
             print('No motion detected. Sending reminder email #1 to {0}.\n'.format(
               organizerEmail
             ))
@@ -129,8 +131,8 @@ def start():
             time.sleep(.5)
     else:
       print 'No meeting is starting now. Sleeping for {0} seconds.\n'.format(config.no_meeting_timeout)
-
       time.sleep(config.no_meeting_timeout)
 
+      meetings = getTodaysRoomMeetings(config.room_email, calendarService)
 
 start()
