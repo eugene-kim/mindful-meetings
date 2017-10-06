@@ -83,11 +83,11 @@ def start():
       currentMeeting = getCurrentMeeting(meetings)
 
       try:
-        print "Scheduled meeting \"{0}\" is starting now.".format(currentMeeting['summary'])
+        print "Scheduled meeting \"{0}\" is starting now.\n".format(currentMeeting['summary'])
       except KeyError, e:
-        print "Scheduled meeting is starting now."
+        print "Scheduled meeting is starting now.\n"
 
-      print "Waiting {0} seconds for the room to clear of previous inhabitants.".format(config.meeting_started_sleep_length)
+      print "Waiting {0} seconds for the room to clear of previous inhabitants.\n".format(config.meeting_started_sleep_length)
       time.sleep(config.meeting_started_sleep_length)
 
       if (wasMotionDetected()):
@@ -104,7 +104,7 @@ def start():
             removeRoomFromMeeting(config.room_email, currentMeeting, calendarService)
             break
           else:
-            print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.'.format(
+            print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.\n'.format(
               loopCount,
               organizerEmail,
               config.no_motion_sleep_length
@@ -114,7 +114,7 @@ def start():
             loopCount += 1
 
     else:
-      print 'No meeting is starting now. Sleeping for {0} seconds.'.format(config.no_meeting_timeout)
+      print 'No meeting is starting now. Sleeping for {0} seconds.\n'.format(config.no_meeting_timeout)
 
       time.sleep(config.no_meeting_timeout)
 
