@@ -25,7 +25,7 @@ def emailuser(mailto, mailtype):
 		  <body>
 		    <p><b>We have detected no activity in your meeting room for """ + mailtype_s + """ minutes.</b></p>
 		    <p>Please release your room if you not longer need the room:</p>
-		    <p>---The Meeting Room Police</p>
+		    <p>---The Mindful Meeting Team</p>
 		  </body>
 		</html>
 		"""
@@ -39,7 +39,7 @@ def emailuser(mailto, mailtype):
 		  <body>
 		    <p><b>Sorry, we have detected no activity in your meeting room for """ + mailtype_s + """ minutes.</b></p>
 		    <p>We have unbooked your room.</p>
-		    <p>---The Meeting Room Police</p>
+		    <p>---The Mindful Meeting Team</p>
 		  </body>
 		</html>
 		"""
@@ -54,7 +54,7 @@ def emailuser(mailto, mailtype):
 	  
 	# Define SMTP email server details
 	smtp_server = 'smtp.gmail.com'
-	smtp_user   = 'tuser@kenzyworld.com'
+	smtp_user   = 'mindful-meetings@kenzyworld.com'
 	smtp_pass   = 'abc123456'
 	  
 	# Construct email
