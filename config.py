@@ -13,10 +13,10 @@ api_scopes = ['https://www.googleapis.com/auth/admin.directory.resource.calendar
 
 # Sleep times are in seconds.
 # Time to sleep if there isn't a meeting going on right now.
-no_meeting_timeout = 10
+no_meeting_timeout = 5
 
 # Amount of time to give people who are in the previous meeting to leave the room.
-meeting_started_sleep_length = 1
+meeting_started_sleep_length = 5
 
-# Amount of time give people from the previous room to leave the room.
-no_motion_sleep_length = 1
+# Sleep time before checking again if there's motion in the room.
+no_motion_sleep_length = 5

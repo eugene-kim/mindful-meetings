@@ -46,8 +46,6 @@ def getDatetimeFromDatetimeString(datetimeString):
   return iso8601.parse_date(datetimeString)
 
 def removeRoomFromMeeting(roomEmail, meeting, calendarService):
-  pp.pprint(meeting)
-
   try:
     calendarService.events().delete(calendarId=roomEmail, eventId=meeting['id']).execute()
   except Exception, e:
@@ -103,7 +101,7 @@ def start():
           if (loopCount == 4):
             print('No motion detected and maximum time reached. Freeing up the room for others to reserve.')
 
-            removeRoomFromMeeting(roomEmail, currentMeeting, calendarService)
+            removeRoomFromMeeting(config.room_email, currentMeeting, calendarService)
             break
           else:
             print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.'.format(
