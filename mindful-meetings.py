@@ -10,6 +10,7 @@ import iso8601
 import time
 import datetime
 import config
+import mindfulmail
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -109,7 +110,8 @@ def start():
               organizerEmail,
               config.no_motion_sleep_length
             ))
-            # Send email
+
+            mindfulmail.emailuser(organizerEmail, loopCount * 5)
 
             loopCount += 1
 
