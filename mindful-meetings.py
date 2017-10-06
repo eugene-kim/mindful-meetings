@@ -102,29 +102,31 @@ def start():
           startTime = time.time()
           
           print 'Human presence has been detected in the meeting room. Thank you for being mindful.'
+          break
         else:
           organizer = currentMeeting['organizer']
           organizerEmail = organizer['email']
           endTime = time.time()
           totaltime = endTime-startTime
 
-          if int(totaltime) == 15:
+          if int(totaltime) == 60:
             print('No motion detected and maximum time reached. Freeing up the room for others to reserve.')
             removeRoomFromMeeting(config.room_email, currentMeeting, calendarService)
             mindfulmail.emailuser(organizerEmail, 15)
+            time.sleep(.5)
             break
-          if int(totaltime) == 10:
-            print('No motion detected. Sending reminder email #2 to {0}.\nSleeping for {1} seconds.\n'.format(
-              organizerEmail,
-              config.no_motion_sleep_length
+          if int(totaltime) == 40:
+            print('No motion detected. Sending reminder email #2 to {0}.\n'.format(
+              organizerEmail
             ))
             mindfulmail.emailuser(organizerEmail, 10)
-          if int(totaltime) == 5:
-            print('No motion detected. Sending reminder email #1 to {0}.\nSleeping for {1} seconds.\n'.format(
-              organizerEmail,
-              config.no_motion_sleep_length
+            time.sleep(.5)
+          if int(totaltime) == 20:
+            print('No motion detected. Sending reminder email #1 to {0}.\n'.format(
+              organizerEmail
             ))
             mindfulmail.emailuser(organizerEmail, 5)
+            time.sleep(.5)
     else:
       print 'No meeting is starting now. Sleeping for {0} seconds.\n'.format(config.no_meeting_timeout)
 
