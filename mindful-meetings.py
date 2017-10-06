@@ -1,5 +1,6 @@
 # Interfaces with G Suite to manage a meeting's room resource.
 
+from gpiozero import MotionSensor
 from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
@@ -16,7 +17,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def getCalendarService():
   credentials = ServiceAccountCredentials.from_json_keyfile_name(os.environ["G_APPS_PRIVATE_KEY_PATH"], scopes=config.api_scopes)
-  delegated_credentials = credentials.create_delegated('ekim@kenzyworld.com')
+  delegated_credentials = credentials.create_delegated(config.impersonated_user_email)
   http_auth = delegated_credentials.authorize(Http())
   calendar = build('calendar', 'v3', http=http_auth)
 
@@ -70,6 +71,8 @@ def wasMotionDetected():
   return False
 
 def start():
+  pir = MotionSensor(config.gpio_pin)
+  
   calendarService = getCalendarService()
   meetings = getTodaysRoomMeetings(config.room_email, calendarService)
 
@@ -88,33 +91,40 @@ def start():
       except KeyError, e:
         print "Scheduled meeting is starting now.\n"
 
+      # Wait for the stragglers to leave.
       print "Waiting {0} seconds for the room to clear of previous inhabitants.\n".format(config.meeting_started_sleep_length)
       time.sleep(config.meeting_started_sleep_length)
 
-      if (wasMotionDetected()):
-        print 'Human presence has been detected in the meeting room. Thank you for being mindful.'
-      else:
-        loopCount = 1
-        while (wasMotionDetected() is False):
+      startTime = time.time()
+      
+      while True: 
+        if pir.motion_detected:
+          startTime = time.time()
+          
+          print 'Human presence has been detected in the meeting room. Thank you for being mindful.'
+        else:
           organizer = currentMeeting['organizer']
           organizerEmail = organizer['email']
+          endTime = time.time()
+          totaltime = endTime-startTime
 
-          if (loopCount == 4):
+          if int(totaltime) == 15:
             print('No motion detected and maximum time reached. Freeing up the room for others to reserve.')
-
             removeRoomFromMeeting(config.room_email, currentMeeting, calendarService)
+            mindfulmail.emailuser(organizerEmail, 15)
             break
-          else:
-            print('No motion detected. Sending reminder email #{0} to {1}.\nSleeping for {2} seconds.\n'.format(
-              loopCount,
+          if int(totaltime) == 10:
+            print('No motion detected. Sending reminder email #2 to {0}.\nSleeping for {1} seconds.\n'.format(
               organizerEmail,
               config.no_motion_sleep_length
             ))
-
-            mindfulmail.emailuser(organizerEmail, loopCount * 5)
-
-            loopCount += 1
-
+            mindfulmail.emailuser(organizerEmail, 10)
+          if int(totaltime) == 5:
+            print('No motion detected. Sending reminder email #1 to {0}.\nSleeping for {1} seconds.\n'.format(
+              organizerEmail,
+              config.no_motion_sleep_length
+            ))
+            mindfulmail.emailuser(organizerEmail, 5)
     else:
       print 'No meeting is starting now. Sleeping for {0} seconds.\n'.format(config.no_meeting_timeout)
 

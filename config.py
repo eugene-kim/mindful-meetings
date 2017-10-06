@@ -20,3 +20,8 @@ meeting_started_sleep_length = 5
 
 # Sleep time before checking again if there's motion in the room.
 no_motion_sleep_length = 5
+
+# GPIO Pin number that output is connected to
+gpio_pin = 4
+
+impersonated_user_email = 'ekim@kenzyworld.com'
